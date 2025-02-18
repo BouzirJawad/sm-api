@@ -5,10 +5,10 @@ const router = express.Router();
 router.post("/", async (req, res) => {
     try {
         const newProduct = new Product({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            message: req.body.message
+            name: req.body.name,
+            descreption: req.body.descreption,
+            price: req.body.price,
+            quantity: req.body.quantity
         });
         await newProduct.save();
         res.status(201).json({message: "product added successfully"});
@@ -35,6 +35,27 @@ router.get('/:id', async (req, res)=>{
         res.json(messageByID);
     } catch (error) {
         res.status(500).json({error: error.message})
+    }
+});
+
+router.put('/:id', async (req, res)=>{
+    try {
+        const products = await Product.find();
+        if (products.length === 0) {
+            return res.status(404).json({error: 'No product to update'});
+        }
+        else{
+            const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+                new: true,
+                overwrite: true,
+            });
+            if (!product) {
+                return res.status(404).json({error: 'Product not found'})
+            }
+            res.json(product);
+        }
+    } catch (error) {
+        res.status(400).json({error: error.message});
     }
 });
 
